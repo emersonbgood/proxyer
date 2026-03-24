@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head><title>Coin Proxy</title></head>
+<body>
+    <div id="login-section">
+        <input id="user" placeholder="Username">
+        <input id="code" placeholder="3-digit code" maxlength="3">
+        <button onclick="login()">Login</button>
+    </div>
+
+    <div id="main-ui" style="display:none;">
+        <h2 id="welcome"></h2>
+        <div id="admin-controls" style="display:none;">
+            <h3>Admin Panel</h3>
+            <input id="target-user" placeholder="User to give coins">
+            <button onclick="changeCoins(1)">Give Coin</button>
+        </div>
+        
+        <div id="user-controls">
+            <input id="url" placeholder="Enter URL">
+            <button onclick="getLink()">Use 1 Coin for Permalink</button>
+            <p id="result"></p>
+        </div>
+    </div>
+
+    <script>
+        const API = "http://YOUR_PI_URL:5000"; 
+        let currentUser = "";
+
+        async function login() {
+            const user = document.getElementById('user').value;
+            const code = document.getElementById('code').value;
+            const res = await fetch(`${API}/login`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({user, code})
+            });
+            if (res.ok) {
+                const data = await res.json();
+                currentUser = user;
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('main-ui').style.display = 'block';
+                if (data.role === 'admin') document.getElementById('admin-controls').style.display = 'block';
+            } else { alert("Invalid login"); }
+        }
+
+        async function getLink() {
+            const url = document.getElementById('url').value;
+            const res = await fetch(`${API}/process-url`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({user: currentUser, url: url})
+            });
+            const data = await res.json();
+            document.getElementById('result').innerText = data.permalink || data.error;
+        }
+    </script>
+</body>
+</html>
