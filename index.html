@@ -54,6 +54,21 @@
             const data = await res.json();
             document.getElementById('result').innerText = data.permalink || data.error;
         }
+        async function giveCoin() {
+            const target = document.getElementById('target-user').value; // Make sure this ID matches your input
+            const res = await fetch(`${API}/admin/update-coins`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    admin_user: "admin", 
+                    target_user: target, 
+                    amount: 1  // This gives 1 coins at once
+                })
+            });
+            const data = await res.json();
+            alert(data.message);
+        }
+
     </script>
 </body>
 </html>
